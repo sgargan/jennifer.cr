@@ -28,6 +28,8 @@ module Jennifer
       define_fields(INT_FIELDS, default: 0)
       define_fields(FLOAT_FIELDS, default: 0.0)
 
+      property :key
+
       def initialize
         @adapter = "postgres"
         @host = "localhost"
@@ -35,6 +37,7 @@ module Jennifer
         @migration_files_path = "./db/migrations"
         @schema = "public"
         @db = ""
+        @key = :default
 
         @initial_pool_size = 1
         @max_pool_size = 5
@@ -151,7 +154,10 @@ module Jennifer
 
     def self.get_instance(config_name : Symbol = :default)
       return @@configs[config_name] if @@configs.has_key?(config_name)
-      ConfigInstance.new.tap {|config| @@configs[config_name] = config}
+      ConfigInstance.new.tap do |config|
+        @@configs[config_name] = config
+        config.key = config_name
+      end
     end
 
     def self.reset_config
